@@ -34,6 +34,9 @@ Version 0.02 fixed some minor problems.
 
 Version 0.03 gets the prerequisites right in Makefile.PL.
 
+Version 0.04 corrects a number of bugs, and updates the prerequisite
+for PadWalker to 0.09.
+
 INSTALLATION
 
 To install this module type the following:

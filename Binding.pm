@@ -1,14 +1,14 @@
 ##==============================================================================
 ## Perl6::Binding - implement Perl6 aliasing features
 ##==============================================================================
-## $Id: Binding.pm,v 0.3 2003/04/30 01:03:56 kevin Exp $
+## $Id: Binding.pm,v 0.4 2003/06/19 02:20:47 kevin Exp $
 ##==============================================================================
 require 5.006;
 
 package Perl6::Binding;
 use strict;
 use warnings;
-our ($VERSION) = q$Revision: 0.3 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
+our ($VERSION) = q$Revision: 0.4 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
 require XSLoader;
 XSLoader::load('Perl6::Binding', $VERSION);
 
@@ -26,12 +26,12 @@ Perl6::Binding - implement Perl6 aliasing features
 =head1 SYNOPSIS
 
 	use Perl6::Binding;
-	
+
 	my ($foo, @bar, %baz) := @hash{qw/foo bar baz/};
 	my ($foo, @bar, %baz) := *%hash;
 	my ($foo, @bar, %baz) := *@array;
 	my @array1 := @array2;
-	
+
 =head1 DESCRIPTION
 
 This module creates lexical aliases to items that can be either lexical or
@@ -54,7 +54,7 @@ to each of them, you'll discover that the references are identical.
 The example above may not look that useful, but something like this could be:
 
 	my %hash := %{$parameter->{index}->{option}};
-	
+
 Now you can type C<$hash{foo}> instead of C<<
 $parameter->{index}->{option}->{foo} >>. Not only does this save typing, but it
 should execute slighly faster as well.
@@ -106,7 +106,7 @@ following statements are invalid:
 
 	my @foo := %bar;
 	my $baz := @foobar;
-	
+
 This module works both at compile time (via a source filter) and at runtime.
 
 =head1 NOTES
@@ -184,7 +184,7 @@ sub unimport {
 sub filter {
 	my ($f) = @_;
 	my $status = filter_read();
-	
+
 	return $status if $status <= 0 || /^\s*#/;
 	if (/^(.*)\b(my\b.*)$/s) {
 		my $prior = $1;
@@ -220,7 +220,7 @@ sub filter {
 						$text = extract_bracketed($_, '[{"\'q}]');
 					} while (!$text && ($status = filter_read()) > 0);
 					if ($text ne '') {
-						$token = substr($text, 0, 1) eq '{' 
+						$token = substr($text, 0, 1) eq '{'
 							? 'bracexpr' : 'brackexpr';
 						$value = $text;
 						$recovery .= $text;
@@ -249,7 +249,7 @@ sub filter {
 		$_ = ("\n" x $newline_count) . $_;
 		$_ = $prior . $f->_process($result) . $_;
 	}
-	return $status;	
+	return $status;
 }
 
 ##==============================================================================
@@ -258,15 +258,15 @@ sub filter {
 sub _process {
 	my ($f, $result) = @_;
 	my ($left, $right) = @$result;
-	$result  = 'my (' 
+	$result  = 'my ('
 			 . join(
-				', ', 
+				', ',
 				map { $_->[1] } grep { $_->[0] ne 'undef' } @$left
 			 )
 			 . '); ';
 	$result .= 'Perl6::Binding::alias(['
 			 . join(
-			 	', ', 
+			 	', ',
 			 	map {
 			 		$_->[0] eq 'var'
 			 			? qq{[ 0, '@{[$_->[1]]}', \\@{[$_->[1]]} ]}
@@ -277,7 +277,7 @@ sub _process {
 			 )
 			 . '], '
 			 . join(
-			 	', ', 
+			 	', ',
 			 	map {
 			 		$_->[0] eq 'var'
 			 			? qq{[ 0, @{[$_->[1]]} ]}
@@ -348,7 +348,7 @@ sub alias {
 					die "internal error: invalid vartype '$vartype'";
 				}
 				last;	## no sense in continuing!
-			} 
+			}
 			##------------------------------------------------------------------
 			## Not flattened.  Actually get the next element from the right
 			## side and create an alias to it in the element on the left side.
@@ -363,7 +363,8 @@ sub alias {
 				## simply becomes an alias to the item in $rcurrent.
 				##--------------------------------------------------------------
 				if ($rtype == 0) {
-					_lexalias($cv, $varname, $rrefs[0]);
+					my $value = $rrefs[0];
+					_lexalias($cv, $varname, $value);
 					undef $rtype;
 					shift;
 				}
@@ -376,8 +377,10 @@ sub alias {
 				elsif ($rtype == 1) {
 					my $rref = $rrefs[0];
 					if (UNIVERSAL::isa($rref, 'HASH')) {
-						if ((ref $rref->{$varid}) =~ /^ARRAY|HASH$/) {
-							_lexalias($cv, $varname, $rref->{$varid});
+						if ((ref $rref->{$varid}) =~ /^ARRAY|HASH$/
+						  && $vartype ne '$') {
+						  	my $value = $rref->{$varid};
+							_lexalias($cv, $varname, $value);
 						} else {
 							_lexalias($cv, $varname, \$rref->{$varid});
 						}
@@ -386,8 +389,10 @@ sub alias {
 							undef $rtype;
 							shift;
 							redo;
-						} elsif ((ref $rref->[$rpos]) =~ /^ARRAY|HASH$/) {
-							_lexalias($cv, $varname, $rref->[$rpos++]);
+						} elsif ((ref $rref->[$rpos]) =~ /^ARRAY|HASH$/
+						  && $vartype ne '$') {
+						  	my $value = $rref->[$rpos++];
+							_lexalias($cv, $varname, $value);
 						} else {
 							_lexalias($cv, $varname, \$rref->[$rpos++]);
 						}
@@ -421,24 +426,32 @@ sub alias {
 			##------------------------------------------------------------------
 			## If there aren't any more arguments on the right, might as well
 			## exit the loop.
-			##------------------------------------------------------------------ 
+			##------------------------------------------------------------------
 			else {
 				last;
 			}
-		} 
+		}
 		##----------------------------------------------------------------------
 		## Otherwise, skip the next item on the right side.
 		##----------------------------------------------------------------------
-		elsif (defined $rtype) {
-			if (UNIVERSAL::isa($rrefs[0], 'ARRAY')) {
-				if (++$rpos >= @{$rrefs[0]}) {
-					undef $rtype;
-					shift;
-				}
-			} 
-		}
 		else {
-			shift;
+			unless (defined $rtype) {
+				($rtype, @rrefs) = @{$_[0]};
+				$rpos = 0;
+			}
+			if ($rtype == 0) {
+				undef $rtype;
+				shift;
+			} elsif ($rtype == 1) {
+				my $rref = $rrefs[0];
+				if (UNIVERSAL::isa($rref, 'ARRAY')) {
+					if ($rpos++ >= @$rref) {
+						undef $rtype;
+						shift;
+						redo;
+					}
+				}
+			}
 		}
 	}
 }
@@ -966,7 +979,7 @@ sub accept {
 
 sub error {
 	my ($parser, @msg) = @_;
-	
+
 	die join('', @msg);
 }
 
@@ -978,6 +991,9 @@ sub error {
 
 ##==============================================================================
 ## $Log: Binding.pm,v $
+## Revision 0.4  2003/06/19 02:20:47  kevin
+## Some bug fixes, some major, some minor.
+##
 ## Revision 0.3  2003/04/30 01:03:56  kevin
 ## Change to Makefile.PL to add proper prerequisites.
 ##

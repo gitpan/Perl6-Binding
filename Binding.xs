@@ -5,6 +5,7 @@
 #include "ppport.h"
 
 /* Stolen from Devel::LexAlias and Devel::Caller */
+/* $Id: Binding.xs,v 0.4 2003/06/19 02:22:13 kevin Exp $ */
 
 MODULE = Perl6::Binding		PACKAGE = Perl6::Binding		
 

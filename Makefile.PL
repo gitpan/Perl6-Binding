@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Perl6::Binding',
     'VERSION_FROM'	=> 'Binding.pm', # finds $VERSION
-    'PREREQ_PM'		=> { 'PadWalker' => 0.08, 
+    'PREREQ_PM'		=> { 'PadWalker' => 0.09, 
     			     'Filter::Util::Call' => 1.06,
     			     'Text::Balanced' => 1.89,
     			   },
