@@ -1,14 +1,14 @@
 ##==============================================================================
 ## Perl6::Binding - implement Perl6 aliasing features
 ##==============================================================================
-## $Id: Binding.pm,v 0.5 2003/12/17 03:58:31 kevin Exp $
+## $Id: Binding.pm,v 1.0 2004/05/23 01:12:28 kevin Exp $
 ##==============================================================================
 require 5.006;
 
 package Perl6::Binding;
 use strict;
 use warnings;
-our ($VERSION) = q$Revision: 0.5 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
+our $VERSION = '0.6';
 require XSLoader;
 XSLoader::load('Perl6::Binding', $VERSION);
 
@@ -113,17 +113,22 @@ This module works both at compile time (via a source filter) and at runtime.
 
 =over 4
 
-=item o
+=item *
 
 It's possible that the source filter might find something that looks like the
 statements it handles in odd locations, such as within a string. If this
 happens, use C<no Perl6::Binding> to turn off the filter where necessary. Don't
 forget to turn it back on afterwards!
 
-=item o
+=item *
 
 This is currently alpha software. It seems to work, but I am sure there are odd
 bugs lurking in the woodwork. Please let me know if you find them.
+
+=item *
+
+Version 0.6 fixes a long-standing problem in that bindings in recursive
+subroutines did not work.  Now they do.
 
 =back
 
@@ -713,7 +718,8 @@ use vars qw(@RuleTexts @StateDefaults @RuleTokenCounts @RuleTokens
 
 %TransitionTable = (
 	"@" => sub {
-		(grep { $_ == $_[1] } (1, 7, 8, 13, 23, 24, 27, 39)) && $_[0]->shift(3, $_[2])
+		(grep { $_ == $_[1] } (1, 7, 8, 13, 23, 24, 27, 39)) && $_[0]->shift(3,
+$_[2])
 	},
 	":=" => sub {
 		$_[1] == 6 && $_[0]->shift(13, $_[2])
@@ -721,10 +727,12 @@ use vars qw(@RuleTexts @StateDefaults @RuleTokenCounts @RuleTokens
 	"\$" => sub {
 		$_[1] == 33 && $_[0]->shift(42, $_[2])
 		or (grep { $_ == $_[1] } (25, 32)) && $_[0]->shift(34, $_[2])
-		or (grep { $_ == $_[1] } (1, 7, 8, 13, 23, 24, 27, 39)) && $_[0]->shift(4, $_[2])
+		or (grep { $_ == $_[1] } (1, 7, 8, 13, 23, 24, 27, 39)) &&
+$_[0]->shift(4, $_[2])
 	},
 	"%" => sub {
-		(grep { $_ == $_[1] } (1, 7, 8, 13, 23, 24, 27, 39)) && $_[0]->shift(5, $_[2])
+		(grep { $_ == $_[1] } (1, 7, 8, 13, 23, 24, 27, 39)) && $_[0]->shift(5,
+$_[2])
 	},
 	"(" => sub {
 		$_[1] == 1 && $_[0]->shift(7, $_[2])
@@ -999,6 +1007,9 @@ sub error {
 
 ##==============================================================================
 ## $Log: Binding.pm,v $
+## Revision 1.0  2004/05/23 01:12:28  kevin
+## Initial revision
+##
 ## Revision 0.5  2003/12/17 03:58:31  kevin
 ## Complain if a hash element being aliased doesn't exist,
 ## rather than silently creating a new hash element.

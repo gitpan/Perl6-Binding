@@ -41,6 +41,10 @@ Version 0.05 checks to see if a hash element exists before attempting
 to create an alias for it, and modifies the tests to skip several of them
 due to a problem in PadWalker with Perl 5.8.x.
 
+Version 0.06 fixes a long-standing problem with bindings in recursive
+subroutines. Basically, the underlying XS code was always binding the variable
+in the first call, not the one at the current stack level.
+
 INSTALLATION
 
 To install this module type the following:
@@ -60,7 +64,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright 2003 Kevin Michael Vail
+Copyright 2003-2004 Kevin Michael Vail
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

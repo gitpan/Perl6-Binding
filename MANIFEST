@@ -1,4 +1,3 @@
-Binding.pm
 Binding.xs
 Makefile.PL
 MANIFEST
@@ -8,4 +7,5 @@ t/advanced.t
 t/array.t
 t/basic.t
 t/hash.t
-META.yml                                Module meta-data (added by MakeMaker)
+lib/Perl6/Binding.pm
+META.yml                                 Module meta-data (added by MakeMaker)

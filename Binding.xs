@@ -5,7 +5,7 @@
 #include "ppport.h"
 
 /* Stolen from Devel::LexAlias and Devel::Caller */
-/* $Id: Binding.xs,v 0.4 2003/06/19 02:22:13 kevin Exp $ */
+/* $Id: Binding.xs,v 1.0 2004/05/23 01:12:28 kevin Exp $ */
 
 MODULE = Perl6::Binding		PACKAGE = Perl6::Binding		
 
@@ -15,7 +15,7 @@ _lexalias(SV* cv_ref, char *name, SV* new_rv)
 {
     CV *cv   = SvROK(cv_ref) ? (CV*) SvRV(cv_ref) : NULL;
     AV* padn = cv ? (AV*) AvARRAY(CvPADLIST(cv))[0] : PL_comppad_name;
-    AV* padv = cv ? (AV*) AvARRAY(CvPADLIST(cv))[1] : PL_comppad;
+    AV* padv = cv ? (AV*) AvARRAY(CvPADLIST(cv))[CvDEPTH(cv)] : PL_comppad;
     SV* new_sv;
     I32 i;
 

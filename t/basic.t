@@ -3,18 +3,12 @@
 
 #########################
 
-# change 'tests => 1' to 'tests => last_test_to_print';
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 17 };
+BEGIN { plan tests => 24 };
 use Perl6::Binding;
 ok(1);
-
-#########################
-
-# Insert your test code below, the Test module is use()ed here so read
-# its man page ( perldoc Test ) for help writing this test script.
 
 sub test_arguments {
 	my($zero,$one,@two,%three):=*@_;
@@ -46,7 +40,7 @@ sub new {
 }
 
 sub test {
-	my ($self, $four, @five, %six) := *@_;
+	my ($self, $four, @five, %six, $level) := *@_;
 	main::ok(ref $self eq 'test_hash_methods'); 
 	my ($one, @two, %three) := *%$self;
 	main::ok($four eq 'four');
@@ -55,6 +49,10 @@ sub test {
 	main::ok($one eq 'one');
 	main::ok($two[0] eq 'two' && $two[1] eq 'three');
 	main::ok($three{'one'} == 1 && $three{'two'} == 2);
+	
+	if ($level == 0) {
+		$self->test(@_[1 .. 3], 1);
+	}
 }
 
 package main;
@@ -66,7 +64,8 @@ my $t = new test_hash_methods;
 $t->test(
 	'four',
 	[ 'five', 'six' ],
-	{ 'seven' => 7, 'eight' => 8 }
+	{ 'seven' => 7, 'eight' => 8 },
+	0
 );
 
 if ($] >= 5.008) {
