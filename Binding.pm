@@ -1,14 +1,14 @@
 ##==============================================================================
 ## Perl6::Binding - implement Perl6 aliasing features
 ##==============================================================================
-## $Id: Binding.pm,v 0.4 2003/06/19 02:20:47 kevin Exp $
+## $Id: Binding.pm,v 0.5 2003/12/17 03:58:31 kevin Exp $
 ##==============================================================================
 require 5.006;
 
 package Perl6::Binding;
 use strict;
 use warnings;
-our ($VERSION) = q$Revision: 0.4 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
+our ($VERSION) = q$Revision: 0.5 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
 require XSLoader;
 XSLoader::load('Perl6::Binding', $VERSION);
 
@@ -134,6 +134,12 @@ L<Filter::Util::Call|Filter::Util::Call>
 L<Text::Balanced|Text::Balanced>
 
 L<PadWalker|PadWalker>
+
+=head1 BUGS
+
+Under Perl 5.8.x, it is not possible to create aliases at the root level
+of the program due to a problem in PadWalker 0.09 and 0.10 (see the README
+for PadWalker).  Aliases created in subroutines continue to work, however.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -377,6 +383,8 @@ sub alias {
 				elsif ($rtype == 1) {
 					my $rref = $rrefs[0];
 					if (UNIVERSAL::isa($rref, 'HASH')) {
+						croak "key '$varid' doesn't exist"
+							unless exists $rref->{$varid};
 						if ((ref $rref->{$varid}) =~ /^ARRAY|HASH$/
 						  && $vartype ne '$') {
 						  	my $value = $rref->{$varid};
@@ -991,6 +999,10 @@ sub error {
 
 ##==============================================================================
 ## $Log: Binding.pm,v $
+## Revision 0.5  2003/12/17 03:58:31  kevin
+## Complain if a hash element being aliased doesn't exist,
+## rather than silently creating a new hash element.
+##
 ## Revision 0.4  2003/06/19 02:20:47  kevin
 ## Some bug fixes, some major, some minor.
 ##

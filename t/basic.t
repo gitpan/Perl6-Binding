@@ -69,15 +69,23 @@ $t->test(
 	{ 'seven' => 7, 'eight' => 8 }
 );
 
-my $scalar1 = [ qw/one two three/ ];
-my @array := @$scalar1;
-ok($array[0] eq 'one' && $array[1] eq 'two' && $array[2] eq 'three');
-my $scalar2 = { 'one' => 1, 'two' => 2, 'three' => 3 };
-my %hash := %$scalar2;
-ok($hash{'one'} == 1 && $hash{'two'} == 2 && $hash{'three'} == 3);
-my $thirtyseven = "thirty-seven";
-my $scalarx := $thirtyseven;
-ok($scalarx eq 'thirty-seven');
-my $scalar3 = \$thirtyseven;
-my $scalar := $scalar3;
-ok($$scalar eq 'thirty-seven');
+if ($] >= 5.008) {
+	skip("skip | Due to a problem in PadWalker in 5.8.x,", 1);
+	skip("skip | aliases can't be created at the root level.", 1);
+	skip("skip | However, aliases in subroutines still work.", 1);
+	skip("skip | We apologize for the inconvenience.", 1);
+} else {
+	my $scalar1 = [ qw/one two three/ ];
+	my @array := @$scalar1;
+	
+	ok($array[0] eq 'one' && $array[1] eq 'two' && $array[2] eq 'three');
+	my $scalar2 = { 'one' => 1, 'two' => 2, 'three' => 3 };
+	my %hash := %$scalar2;
+	ok($hash{'one'} == 1 && $hash{'two'} == 2 && $hash{'three'} == 3);
+	my $thirtyseven = "thirty-seven";
+	my $scalarx := $thirtyseven;
+	ok($scalarx eq 'thirty-seven');
+	my $scalar3 = \$thirtyseven;
+	my $scalar := $scalar3;
+	ok(defined $$scalar && $$scalar eq 'thirty-seven');
+}

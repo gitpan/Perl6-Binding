@@ -37,6 +37,10 @@ Version 0.03 gets the prerequisites right in Makefile.PL.
 Version 0.04 corrects a number of bugs, and updates the prerequisite
 for PadWalker to 0.09.
 
+Version 0.05 checks to see if a hash element exists before attempting
+to create an alias for it, and modifies the tests to skip several of them
+due to a problem in PadWalker with Perl 5.8.x.
+
 INSTALLATION
 
 To install this module type the following:

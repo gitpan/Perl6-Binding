@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 10 };
+BEGIN { plan tests => 11 };
 use Perl6::Binding;
 ok(1);
 
@@ -48,6 +48,10 @@ sub testsub {
 	ok($seven == 7);
 	$seven = 77;
 	ok($hash{'seven'} == 77);
+	eval {
+		my $eight := *%hash;
+	};
+	ok($@);
 }
 
 testsub(\%hash);

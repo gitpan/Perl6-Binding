@@ -8,3 +8,4 @@ t/advanced.t
 t/array.t
 t/basic.t
 t/hash.t
+META.yml                                Module meta-data (added by MakeMaker)
