@@ -1,14 +1,14 @@
 ##==============================================================================
 ## Perl6::Binding - implement Perl6 aliasing features
 ##==============================================================================
-## $Id: Binding.pm,v 1.0 2004/05/23 01:12:28 kevin Exp $
+## $Id: Binding.pm,v 1.1 2004/05/23 01:54:13 kevin Exp $
 ##==============================================================================
 require 5.006;
 
 package Perl6::Binding;
 use strict;
 use warnings;
-our $VERSION = '0.6';
+our $VERSION = '0.601';
 require XSLoader;
 XSLoader::load('Perl6::Binding', $VERSION);
 
@@ -129,6 +129,10 @@ bugs lurking in the woodwork. Please let me know if you find them.
 
 Version 0.6 fixes a long-standing problem in that bindings in recursive
 subroutines did not work.  Now they do.
+
+=item *
+
+Version 0.601 is an update to 0.6 that puts the dependencies back into the Makefile.PL.
 
 =back
 
@@ -1007,6 +1011,9 @@ sub error {
 
 ##==============================================================================
 ## $Log: Binding.pm,v $
+## Revision 1.1  2004/05/23 01:54:13  kevin
+## Fix Makefile.PL.
+##
 ## Revision 1.0  2004/05/23 01:12:28  kevin
 ## Initial revision
 ##
