@@ -1,14 +1,14 @@
 ##==============================================================================
 ## Perl6::Binding - implement Perl6 aliasing features
 ##==============================================================================
-## $Id: Binding.pm,v 0.1 2003/04/27 06:26:41 kevin Exp $
+## $Id: Binding.pm,v 0.2 2003/04/29 00:52:46 kevin Exp $
 ##==============================================================================
 require 5.006;
 
 package Perl6::Binding;
 use strict;
 use warnings;
-our ($VERSION) = q$Revision: 0.1 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
+our ($VERSION) = q$Revision: 0.2 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
 require XSLoader;
 XSLoader::load('Perl6::Binding', $VERSION);
 
@@ -17,7 +17,7 @@ use Text::Balanced qw(extract_bracketed);
 use PadWalker;
 use Carp;
 
-our $INSTALLED = 0;
+our %INSTALLED;
 
 =head1 NAME
 
@@ -159,10 +159,11 @@ the same terms as Perl itself.
 ## import - install the filter
 ##==============================================================================
 sub import {
-	my $class = shift;
-	unless ($INSTALLED) {
+	my $caller = (caller)[1];
+	unless ($INSTALLED{$caller}) {
+		shift;
 		filter_add({ @_ });
-		$INSTALLED = 1;
+		$INSTALLED{$caller} = 1;
 	}
 }
 
@@ -170,9 +171,10 @@ sub import {
 ## unimport - uninstall the filter
 ##==============================================================================
 sub unimport {
-	if ($INSTALLED) {
+	my $caller = (caller)[1];
+	if ($INSTALLED{$caller}) {
 		filter_del();
-		$INSTALLED = 0;
+		delete $INSTALLED{$caller};
 	}
 }
 
@@ -199,8 +201,8 @@ sub filter {
 					$need_line = 0;
 					croak "unexpected EOF or error" if $status <= 0;
 				}
-				s/^(\s+)//;
-				$recovery .= $1 if defined $1;
+				s/^(\s*)//;
+				$recovery .= $1;
 				if (/^(my|undef)\b(.*)$/s
 				 || /^(\(|\)|\*|\@|\$|%|:=|,|;)(.*)$/s) {
 					$token = $1;
@@ -976,6 +978,9 @@ sub error {
 
 ##==============================================================================
 ## $Log: Binding.pm,v $
+## Revision 0.2  2003/04/29 00:52:46  kevin
+## Fix INSTALL functionality and s///.
+##
 ## Revision 0.1  2003/04/27 06:26:41  kevin
 ## Initial Revision
 ##==============================================================================
