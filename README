@@ -30,6 +30,10 @@ identical effects.
 This version is still an alpha version, released so that I can get some feedback
 on bugs and on the general functionality of the module.
 
+Version 0.02 fixed some minor problems.
+
+Version 0.03 gets the prerequisites right in Makefile.PL.
+
 INSTALLATION
 
 To install this module type the following:

@@ -5,9 +5,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Perl6::Binding',
     'VERSION_FROM'	=> 'Binding.pm', # finds $VERSION
-    'PREREQ_PM'		=> { 'PadWalker' => 0, 
-    			     'Filter::Simple' => 0,
-    			     'Text::Balanced' => 0,
+    'PREREQ_PM'		=> { 'PadWalker' => 0.08, 
+    			     'Filter::Util::Call' => 1.06,
+    			     'Text::Balanced' => 1.89,
     			   },
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'Binding.pm', # retrieve abstract from module

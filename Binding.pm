@@ -1,14 +1,14 @@
 ##==============================================================================
 ## Perl6::Binding - implement Perl6 aliasing features
 ##==============================================================================
-## $Id: Binding.pm,v 0.2 2003/04/29 00:52:46 kevin Exp $
+## $Id: Binding.pm,v 0.3 2003/04/30 01:03:56 kevin Exp $
 ##==============================================================================
 require 5.006;
 
 package Perl6::Binding;
 use strict;
 use warnings;
-our ($VERSION) = q$Revision: 0.2 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
+our ($VERSION) = q$Revision: 0.3 $ =~ /^Revision:\s+(\S+)/ or $VERSION = "0.0";
 require XSLoader;
 XSLoader::load('Perl6::Binding', $VERSION);
 
@@ -978,6 +978,9 @@ sub error {
 
 ##==============================================================================
 ## $Log: Binding.pm,v $
+## Revision 0.3  2003/04/30 01:03:56  kevin
+## Change to Makefile.PL to add proper prerequisites.
+##
 ## Revision 0.2  2003/04/29 00:52:46  kevin
 ## Fix INSTALL functionality and s///.
 ##
